@@ -20,6 +20,8 @@
         var app = angular.module('Destinition', []);
         app.controller('simCtrl', function ($scope) {
             $scope.calc = function () {
+                $scope.output = "";
+
                 var orgin = $scope.orgin.replace(/\r?\n/g, "|").split("|");
                 var dest = $scope.dest.replace(/\r?\n/g, "|").split("|");
 
@@ -110,7 +112,8 @@
                 </button>
 
                 <div>
-                <textarea placeholder="output" class="form-control" rows="3" name="output" ng-model="output">
+                <textarea placeholder="output" class="form-control" rows="3" name="output" ng-model="output"
+                          ng-disabled="!output.length">
 </textarea>
                 </div>
             </div>
