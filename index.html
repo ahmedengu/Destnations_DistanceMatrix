@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" style="height:100%;" ng-app="Destinition" ng-controller="simCtrl">
+<head>
+    <meta charset="utf-8">
+    <title>Destinition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="Destinition"/>
+    <meta name="description" content="Destinition"/>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style-library-1.css" rel="stylesheet">
+    <link href="css/blocks.css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://npmcdn.com/particlesjs@1.0.2/dist/particles.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script
+            src="https://maps.googleapis.com/maps/api/js">
+    </script>
+    <script>
+        var app = angular.module('Destinition', []);
+        app.controller('simCtrl', function ($scope) {
+            $scope.calc = function () {
+                var orgin = $scope.orgin.replace(/\r?\n/g, "|").split("|");
+                var dest = $scope.dest.replace(/\r?\n/g, "|").split("|");
+
+                var service = new google.maps.DistanceMatrixService;
+                service.getDistanceMatrix({
+                    origins: orgin,
+                    destinations: dest,
+                    travelMode: 'DRIVING',
+                    unitSystem: google.maps.UnitSystem.METRIC,
+                    avoidHighways: false,
+                    avoidTolls: false
+                }, function (response, status) {
+                    if (status !== 'OK') {
+                        alert('Error was: ' + status);
+                    } else {
+                        console.log(response);
+                        var elements = response.rows[0].elements;
+                        console.log(elements);
+                        $scope.output = "";
+                        for (var i = 0; i < elements.length; i++) {
+                            $scope.output += elements[i].distance.value + '\n';
+                        }
+                        $scope.$apply();
+                    }
+                });
+
+
+            }
+        });
+
+        window.onload = function () {
+            Particles.init({
+                selector: '#myCanvas',
+                color: '#ffffff',
+                connectParticles: true,
+                minDistance: 140
+            });
+        };
+
+    </script>
+    <style>
+        html, body {
+            margin: 0;
+        }
+
+        #myCanvas {
+            position: absolute;
+            display: block;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.4.0/animate.min.css">
+</head>
+<body>
+<canvas id="myCanvas"></canvas>
+
+<header id="header-3" class="soft-scroll header-3">
+    <section class="hero">
+        <div class="container table-responsive">
+            <div class="brand">
+                <a href="#" class="white clouds-hover text-capitalize lead" data-animation-2
+                   data-animation-trigger-2="load" data-animation-type-2="pulse">Destinition</a>
+            </div>
+            <div class="col-md-8 col-md-offset-2 text-center" data-animation-1 data-animation-trigger-1="load"
+                 data-animation-type-1="fadeIn">
+                <div class="editContent">
+                    <h3 class="clouds">Orgin [Each in a line ]<br></h3>
+                </div>
+                <div class="editContent">
+                    <div class="form-group">
+                       <textarea class="form-control" rows="3" name="orgin" ng-model="orgin">
+</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label clouds">Destinitons</label>
+                        <textarea class="form-control" rows="3" name="dest" ng-model="dest">
+</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-md-offset-3 text-center">
+                <button class="btn btn-danger btn-block" ng-click="calc()"
+                        data-animation-1
+                        data-animation-trigger-1="click" data-animation-type-1="pulse"
+                        data-animation-to-remove-1="pulse">Calc
+                </button>
+            </div>
+            <div>
+                <textarea placeholder="output" class="form-control" rows="3" name="output" ng-model="output">
+</textarea>
+            </div>
+        </div>
+    </section>
+</header>
+<script type="text/javascript" src="https://cdn.rawgit.com/MhdAljuboori/6ea3a3fa48248e3a132a/raw/animator.js"></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
+</body>
+</html>
