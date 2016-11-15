@@ -14,7 +14,7 @@
     <script type="text/javascript" src="https://npmcdn.com/particlesjs@1.0.2/dist/particles.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
     <script
-            src="https://maps.googleapis.com/maps/api/js">
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10">
     </script>
     <script>
         var app = angular.module('Destinition', []);
@@ -35,9 +35,7 @@
                     if (status !== 'OK') {
                         alert('Error was: ' + status);
                     } else {
-                        console.log(response);
                         var elements = response.rows[0].elements;
-                        console.log(elements);
                         $scope.output = "";
                         for (var i = 0; i < elements.length; i++) {
                             $scope.output += elements[i].distance.value + '\n';
