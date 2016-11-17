@@ -540,7 +540,7 @@
                         if (destIndex < dest.length - 1)
                             setTimeout(function () {
                                 calcIt(orgin, dest, titles, destIndex + 1, orgIndex, out)
-                            }, getRandomInt(100, 500));
+                            }, getRandomInt(200, 1000));
                         else {
                             $scope.output.push(out);
                             $scope.$apply();
