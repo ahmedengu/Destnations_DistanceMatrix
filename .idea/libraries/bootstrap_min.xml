@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="bootstrap.min" type="javaScript">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/js/bootstrap.min.js" />
+      <root url="file://$PROJECT_DIR$/js/jquery-1.11.1.min.js" />
+      <root url="file://$PROJECT_DIR$/js/angular.min.js" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
