@@ -516,6 +516,7 @@
             $scope.calcButton = false;
             $scope.orgins = "";
             $scope.orginsText = "";
+            $scope.dest = "";
             var service = new google.maps.DistanceMatrixService;
 
             function calcIt(orgin, dest, titles, destIndex, orgIndex, out) {
@@ -540,7 +541,7 @@
                         if (destIndex < dest.length - 1)
                             setTimeout(function () {
                                 calcIt(orgin, dest, titles, destIndex + 1, orgIndex, out)
-                            }, getRandomInt(200, 800));
+                            }, getRandomInt(500, 3000));
                         else {
                             $scope.output.push(out);
                             $scope.$apply();
@@ -563,14 +564,21 @@
             $scope.calc = function () {
                 $scope.output = [];
                 $scope.outTable = [];
-
-
-                $scope.calcButton = true;
-                var destArr = $scope.dest.split(/\r?\n/g);
+                if (!$scope.orgin.length || !$scope.dest.length) {
+                    alert("Origins/Destinations can't be empty!");
+                    return;
+                }
+                if ($scope.orginsText.length && $scope.orgin.split(/\r?\n/g).length != $scope.orginsText.split(/\r?\n/g).length) {
+                    alert("Origin title should be for every orging [# of lines]!");
+                    return;
+                }
                 if (!$scope.orginsText.length)
                     $scope.orginsText = $scope.orgin;
                 $scope.orgins = $scope.orginsText.split(/\r?\n/g);
 
+                var destArr = $scope.dest.split(/\r?\n/g);
+                $scope.destArr = destArr.slice();
+                $scope.calcButton = true;
                 var dest = [];
                 while (destArr.length) {
                     dest.push(destArr.splice(0, 5));
@@ -589,7 +597,11 @@
                     dests.push((items[items.length - 1].length == 0) ? items.slice(0, items.length - 1) : items);
                 }
                 var transposed = dests.transpose();
-                transposed.unshift($scope.orgins);
+                transposed.unshift($scope.orgins.slice());
+                transposed[0].unshift("Dest/Origin");
+                for (var i = 1; i < transposed.length; i++) {
+                    transposed[i].unshift($scope.destArr[i - 1]);
+                }
                 return transposed;
             }
 
@@ -639,12 +651,12 @@
         <div class="container table-responsive">
             <div class="brand">
                 <a href="#" class="white clouds-hover text-capitalize lead" data-animation-2
-                   data-animation-trigger-2="load" data-animation-type-2="pulse">Destinition</a>
+                   data-animation-trigger-2="load" data-animation-type-2="pulse">Destination</a>
             </div>
             <div class="col-md-8 col-md-offset-2 text-center" data-animation-1 data-animation-trigger-1="load"
                  data-animation-type-1="fadeIn">
                 <div class="editContent">
-                    <h3 class="clouds">Orgin [Each in a line ]<br></h3>
+                    <h3 class="clouds">Origins [Each in a line ]<br></h3>
                 </div>
                 <div class="editContent">
                     <div class="form-group">
@@ -652,7 +664,7 @@
 </textarea>
                     </div>
                     <div class="editContent">
-                        <h3 class="clouds">Orgin Title (optional)<br></h3>
+                        <i class="clouds">Origins Title (optional)<br></i>
                     </div>
                     <div class="editContent">
                         <div class="form-group">
@@ -660,7 +672,7 @@
 </textarea>
                         </div>
                         <div class="form-group">
-                            <label class="control-label clouds">Destinitons</label>
+                            <h3 class="control-label clouds">Destinations</h3>
                             <textarea class="form-control" rows="3" name="dest" ng-model="dest">
 </textarea>
                         </div>
@@ -687,7 +699,8 @@
                             ng-show="!calcButton && output.length">
                         Export to CSV
                     </button>
-                    <button type="button" class="btn btn-primary btn-block" ng-click="showTable()"  data-target="#destTable"
+                    <button type="button" class="btn btn-primary btn-block" ng-click="showTable()"
+                            data-target="#destTable"
                             data-toggle="modal"
                             ng-show="!calcButton && output.length">
                         Show table
@@ -717,7 +730,7 @@
             <div class="modal-body" style="
     overflow: scroll;
     ">
-                <table class="well table table-bordered table-responsive table-hover" ng-show="outTable.length">
+                <table class="table table-bordered table-responsive table-hover" ng-show="outTable.length">
                     <tr ng-repeat="row in outTable">
                         <td ng-repeat="col in row track by $index">
                             {{col}}
