@@ -585,7 +585,7 @@
                         $scope.output = [];
                         $scope.$apply();
                     } else {
-                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=400x400&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng()) + "&path=weight:4|color:red|enc:" + encodeURI(result.routes[0].overview_polyline);
+                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=500x400&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng()) + "&path=weight:4|color:red|enc:" + encodeURI(result.routes[0].overview_polyline);
                         var destVal = result.routes[0].legs[0].distance.value;
                         destVal = (($scope.km == '1') ? Math.round(destVal / 1000) : destVal) + '\n';
                         ret.push({
@@ -746,7 +746,7 @@
                     table += "<tr>";
                     table += "<td>Drive " + $scope.outWithMap[j].dest + (($scope.km == '1') ? " Km,  " : " Meter,  ") + $scope.outWithMap[j].time + "</br></br>" + "<img src='icons/red_MarkerA.png' />  " + $scope.outWithMap[j].name + "</br>" + "<img src='icons/blue_MarkerB.png' />  " + $scope.outWithMap[j].destName + "</br></td>";
 
-                    table += "<td><iframe src='https://www.google.com/maps/embed/v1/directions?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&units=metric&mode=driving&origin=" + $scope.outWithMap[j].name + "&destination=" + $scope.outWithMap[j].destName + "' width=\"600\" height=\"450\" frameborder=\"0\" style=\"border:0\" allowfullscreen></iframe></td>";
+                    table += "<td><iframe src='https://www.google.com/maps/embed/v1/directions?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&units=metric&mode=driving&origin=" + $scope.outWithMap[j].name + "&destination=" + $scope.outWithMap[j].destName + "' width=\"500\" height=\"400\" frameborder=\"0\" style=\"border:0\" allowfullscreen></iframe></td>";
 
                     table += "</tr>";
                 }
