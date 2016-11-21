@@ -534,6 +534,7 @@
                     if (status !== 'OK') {
                         alert('Error was: ' + status);
                         $scope.calcButton = false;
+                        $scope.output = [];
                         $scope.$apply();
                     } else {
                         var elements = response.rows[0].elements;
@@ -579,9 +580,10 @@
                     if (status !== 'OK') {
                         alert('Error was: ' + status);
                         $scope.calcButton = false;
+                        $scope.output = [];
                         $scope.$apply();
                     } else {
-                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=600x600&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng()) + "&path=weight:3|color:blue|enc:" + encodeURI(result.routes[0].overview_polyline);
+                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=400x400&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng()) + "&path=weight:3|color:blue|enc:" + encodeURI(result.routes[0].overview_polyline);
                         var destVal = result.routes[0].legs[0].distance.value;
                         ret.push({
                             name: orginNames[orgIndex],
@@ -676,9 +678,31 @@
                 }
                 return transposed;
             }
-
+            var theWindow;
             $scope.showTable = function () {
                 $scope.outTable = $scope.getOutput();
+                var table = "<table><thead><tr>";
+                for (var i = 0; i < $scope.outTable[0].length; i++) {
+                    table += "<th>" + $scope.outTable[0][i] + "</th>";
+                }
+                table += "</tr></thead><tbody>";
+                for (var j = 1; j < $scope.outTable.length; j++) {
+                    table += "<tr>";
+                    for (var i = 0; i < $scope.outTable[j].length; i++) {
+                        if ($scope.outTable[j][i].indexOf("maps.googleapis") !== -1)
+                            table += "<td><img src='" + $scope.outTable[j][i] + "' /></td>";
+                        else
+                            table += "<td>" + $scope.outTable[j][i] + "</td>";
+                    }
+                    table += "</tr>";
+                }
+                table += "</tbody></table>";
+                if (theWindow)
+                    theWindow.close();
+                theWindow = window.open("", "Table");
+                theWindow.document.write("<html><head><title>Table</title><style> table { font-family: arial, sans-serif; border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; } tr:nth-child(even) { background-color: #dddddd; } </style></head><body>" + table + " <script>document.onreadystatechange = function(){ if(document.readyState === 'complete'){window.print();} }\x3C/script></body></html>");
+                theWindow.document.close();
+                theWindow.focus();
             }
         });
 
@@ -768,8 +792,6 @@
                         Export to CSV
                     </button>
                     <button type="button" class="btn btn-primary btn-block" ng-click="showTable()"
-                            data-target="#destTable"
-                            data-toggle="modal"
                             ng-show="!calcButton && output.length">
                         Show table
                     </button>
@@ -788,28 +810,6 @@
     </section>
 </header>
 
-<div class="modal fade pg-show-modal" id="destTable" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Table</h4>
-            </div>
-            <div class="modal-body" style="
-    overflow: scroll;
-    ">
-                <table class="table table-bordered table-responsive table-hover" ng-show="outTable.length">
-                    <tr ng-repeat="row in outTable">
-                        <td ng-repeat="col in row track by $index">
-                            {{(col.indexOf("maps.googleapis")!==-1)?"":col}}
-                            <img ng-if='(col.indexOf("maps.googleapis")!==-1)' ng-src="{{col}}" alt="">
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script type="text/javascript" src="https://cdn.rawgit.com/MhdAljuboori/6ea3a3fa48248e3a132a/raw/animator.js"></script>
 <script type="text/javascript"
