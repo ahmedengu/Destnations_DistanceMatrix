@@ -510,7 +510,7 @@
         };
         var app = angular.module('Destination', ['ngSanitize', 'ngCsv']);
         app.controller('simCtrl', function ($scope) {
-            $scope.km = "0";
+            $scope.km = "1";
             $scope.highways = false;
             $scope.tolls = false;
             $scope.calcButton = false;
@@ -518,6 +518,8 @@
             $scope.orginsText = "";
             $scope.dest = "";
             $scope.orgin = "";
+            $scope.showMap = true;
+
             var distanceMatrixService = new google.maps.DistanceMatrixService;
             var directionsService = new google.maps.DirectionsService();
 
@@ -583,14 +585,17 @@
                         $scope.output = [];
                         $scope.$apply();
                     } else {
-                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=400x400&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng()) + "&path=weight:3|color:blue|enc:" + encodeURI(result.routes[0].overview_polyline);
+                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=400x400&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng()) + "&path=weight:4|color:red|enc:" + encodeURI(result.routes[0].overview_polyline);
                         var destVal = result.routes[0].legs[0].distance.value;
+                        destVal = (($scope.km == '1') ? Math.round(destVal / 1000) : destVal) + '\n';
                         ret.push({
                             name: orginNames[orgIndex],
                             dest: destVal,
-                            staticMap: staticMap
+                            staticMap: staticMap,
+                            time: result.routes[0].legs[0].duration.text,
+                            destName: destArr[destIndex]
                         });
-                        out.dest += (($scope.km == '1') ? Math.round(destVal / 1000) : destVal) + '\n';
+                        out.dest += destVal;
                         if (destIndex < destArr.length - 1)
                             setTimeout(function () {
                                 calcWithMap(orginArr, destArr, orginNames, destIndex + 1, orgIndex, ret, out)
@@ -704,6 +709,32 @@
                 theWindow.document.close();
                 theWindow.focus();
             }
+
+            $scope.showReport = function () {
+                $scope.outWithMap
+                var table = "<h1 align='center'>Report</h1><table><tbody>";
+                last = "";
+                for (var j = 0; j < $scope.outWithMap.length; j++) {
+                    if ($scope.outWithMap[j].name != last) {
+                        table += "<tr><td colspan='2'><br><h3 align='center'>Route and Distance from " + $scope.outWithMap[j].name + " to Multiple Destinations</h3></td></tr>";
+                        last = $scope.outWithMap[j].name;
+                    }
+                    table += "<tr>";
+                    table += "<td>Drive " + $scope.outWithMap[j].dest + (($scope.km == '1') ? " Km,  " : " Meter,  ") + $scope.outWithMap[j].time + "</br></br>" + "<img src='icons/red_MarkerA.png' />  " + $scope.outWithMap[j].name + "</br>" + "<img src='icons/blue_MarkerB.png' />  " + $scope.outWithMap[j].destName + "</br><a href='http://www.google.com.eg/maps/dir/" + encodeURI($scope.outWithMap[j].name) + "/" + encodeURI($scope.outWithMap[j].destName) + "'>Source</a></td>";
+                    table += "<td><img src='" + $scope.outWithMap[j].staticMap + "' /></td>";
+
+                    table += "</tr>";
+                }
+                table += "</tbody></table>";
+                if (theWindow)
+                    theWindow.close();
+                theWindow = window.open("", "Report");
+                theWindow.document.write("<html><head><title>Report</title><style> table { font-family: arial, sans-serif; border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; } tr:nth-child(even) { background-color: #fbfbfb; } </style></head><body>" + table + " <script>document.onreadystatechange = function(){ if(document.readyState === 'complete'){window.print();} }\x3C/script></body></html>");
+                theWindow.document.close();
+                theWindow.focus();
+            }
+
+
         });
 
         window.onload = function () {
@@ -794,6 +825,10 @@
                     <button type="button" class="btn btn-primary btn-block" ng-click="showTable()"
                             ng-show="!calcButton && output.length">
                         Show table
+                    </button>
+                    <button type="button" class="btn btn-info btn-block" ng-click="showReport()"
+                            ng-show="!calcButton && output.length&&showMap">
+                        Show Report
                     </button>
                     <div>
                     </div>
