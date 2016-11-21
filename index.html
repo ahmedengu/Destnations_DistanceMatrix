@@ -712,17 +712,17 @@
 
             $scope.showReport = function () {
                 $scope.outWithMap
-                var table = "<h1 align='center'>Report</h1><table><tbody>";
-                last = "";
+                var table = "<table><tbody>";
+//                last = "";
                 for (var j = 0; j < $scope.outWithMap.length; j++) {
-                    if ($scope.outWithMap[j].name != last) {
+//                    if ($scope.outWithMap[j].name != last) {
                         table += "<tr><td colspan='2'><h3 align='center'>Route and Distance from " + $scope.outWithMap[j].name + " to Multiple Destinations</h3></td></tr>";
-                        last = $scope.outWithMap[j].name;
-                    }
+//                        last = $scope.outWithMap[j].name;
+//                    }
                     table += "<tr>";
                     table += "<td>Drive " + $scope.outWithMap[j].dest + (($scope.km == '1') ? " Km,  " : " Meter,  ") + $scope.outWithMap[j].time + "</br></br>" + "<img src='icons/red_MarkerA.png' />  " + $scope.outWithMap[j].name + "</br>" + "<img src='icons/blue_MarkerB.png' />  " + $scope.outWithMap[j].destName + "</br><a href='http://www.google.com.eg/maps/dir/" + encodeURI($scope.outWithMap[j].name) + "/" + encodeURI($scope.outWithMap[j].destName) + "'>Source</a></td>";
 
-                    var staticMap = $scope.outWithMap[j].staticMap.replace("500x400", "650x580");
+                    var staticMap = $scope.outWithMap[j].staticMap.replace("500x400", "650x650");
                     table += "<td><img src='" + staticMap + "' /></td>";
 
 
@@ -739,17 +739,17 @@
 
             $scope.showReportIframe = function () {
                 $scope.outWithMap
-                var table = "<h1 align='center'>Report</h1><table><tbody>";
-                last = "";
+                var table = "<table><tbody>";
+//                last = "";
                 for (var j = 0; j < $scope.outWithMap.length; j++) {
-                    if ($scope.outWithMap[j].name != last) {
+//                    if ($scope.outWithMap[j].name != last) {
                         table += "<tr><td colspan='2'><br><h3 align='center'>Route and Distance from " + $scope.outWithMap[j].name + " to Multiple Destinations</h3></td></tr>";
-                        last = $scope.outWithMap[j].name;
-                    }
+//                        last = $scope.outWithMap[j].name;
+//                    }
                     table += "<tr>";
                     table += "<td>Drive " + $scope.outWithMap[j].dest + (($scope.km == '1') ? " Km,  " : " Meter,  ") + $scope.outWithMap[j].time + "</br></br>" + "<img src='icons/red_MarkerA.png' />  " + $scope.outWithMap[j].name + "</br>" + "<img src='icons/blue_MarkerB.png' />  " + $scope.outWithMap[j].destName + "</br></td>";
 
-                    table += "<td><iframe src='https://www.google.com/maps/embed/v1/directions?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&units=metric&mode=driving&origin=" + $scope.outWithMap[j].name + "&destination=" + $scope.outWithMap[j].destName + "' width=\"650\" height=\"530\" frameborder=\"0\" style=\"border:0\" allowfullscreen></iframe></td>";
+                    table += "<td><iframe src='https://www.google.com/maps/embed/v1/directions?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&units=metric&mode=driving&origin=" + $scope.outWithMap[j].name + "&destination=" + $scope.outWithMap[j].destName + "' width=\"650\" height=\"610\" frameborder=\"0\" style=\"border:0\" allowfullscreen></iframe></td>";
 
                     table += "</tr>";
                 }
