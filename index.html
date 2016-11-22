@@ -834,7 +834,7 @@
                 </div>
                 <div class="editContent">
                     <div class="form-group">
-                       <textarea class="form-control" rows="3" name="orgin" ng-model="orgin" ng-change="resetAll()">
+                       <textarea class="form-control" rows="3" name="orgin" ng-model="orgin" ng-change="resetAll()" ng-disabled="calcButton">
 </textarea>
                     </div>
                     <div class="editContent">
@@ -843,27 +843,27 @@
                     <div class="editContent">
                         <div class="form-group">
                        <textarea class="form-control" rows="3" name="orgin" ng-model="orginsText"
-                                 ng-change="resetAll()">
+                                 ng-change="resetAll()" ng-disabled="calcButton">
 </textarea>
                         </div>
                         <div class="form-group">
                             <h3 class="control-label clouds">Destinations</h3>
-                            <textarea class="form-control" rows="3" name="dest" ng-model="dest" ng-change="resetAll()">
+                            <textarea class="form-control" rows="3" name="dest" ng-model="dest" ng-change="resetAll()" ng-disabled="calcButton">
 </textarea>
                         </div>
                         <div class="form-group well">
 
-                            <span><input type="radio" name="km" ng-model="km" value="1" ng-click="resetAll()"> Km</span>
+                            <span><input type="radio" name="km" ng-model="km" value="1" ng-click="resetAll()" ng-disabled="calcButton"> Km</span>
                             <span><input type="radio" name="km" ng-model="km" value="0"
-                                         ng-click="resetAll()"> Meter</span>
+                                         ng-click="resetAll()" ng-disabled="calcButton"> Meter</span>
                             <br>
-                            <span><input type="checkbox" name="highways" ng-model="highways" ng-click="resetAll()"> Avoid highways</span>
+                            <span><input type="checkbox" name="highways" ng-model="highways" ng-click="resetAll()" ng-disabled="calcButton"> Avoid highways</span>
                             <br>
-                            <span><input type="checkbox" name="tolls" ng-model="tolls" ng-click="resetAll()"> Avoid tolls</span>
+                            <span><input type="checkbox" name="tolls" ng-model="tolls" ng-click="resetAll()" ng-disabled="calcButton"> Avoid tolls</span>
                             <br>
-                            <span><input type="checkbox" name="showMap" ng-model="showMap" ng-click="resetAll()"> Show map</span>
+                            <span><input type="checkbox" name="showMap" ng-model="showMap" ng-click="resetAll()" ng-disabled="calcButton"> Show map</span>
                             <br>
-                            <span><input type="checkbox" name="oneToOne" ng-model="oneToOne" ng-click="resetAll()"> One to one</span>
+                            <span><input type="checkbox" name="oneToOne" ng-model="oneToOne" ng-click="resetAll()" ng-disabled="calcButton"> One to one</span>
                         </div>
                     </div>
                 </div>
