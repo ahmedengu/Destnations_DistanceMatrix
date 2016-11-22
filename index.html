@@ -670,6 +670,9 @@
 
                 if ($scope.oneToOne) {
                     var ret = [["Origin", "Destination", "Distance"]];
+                    if ($scope.showMap)
+                        ret[0].push("Map");
+
                     for (var j = 0; j < output.length; j++) {
                         var arr = [$scope.orgins[j], $scope.destArr[j], output[j].dest];
                         if ($scope.showMap)
