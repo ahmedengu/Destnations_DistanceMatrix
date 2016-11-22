@@ -545,7 +545,9 @@
                             destText += (($scope.km == '1') ? Math.round(elements[i].distance.value / 1000) : elements[i].distance.value) + '\n';
                         }
                         out.dest += destText;
-                        if (destIndex < dest.length - 1)
+
+
+                        if (!$scope.oneToOne && destIndex < dest.length - 1)
                             setTimeout(function () {
                                 calcIt(orgin, dest, titles, destIndex + 1, orgIndex, out)
                             }, getRandomInt(500, 3000));
@@ -554,7 +556,7 @@
                             $scope.$apply();
                             if (orgIndex < orgin.length - 1) {
                                 setTimeout(function () {
-                                    calcIt(orgin, dest, titles, 0, orgIndex + 1, {
+                                    calcIt(orgin, dest, titles, ($scope.oneToOne) ? orgIndex + 1 : 0, orgIndex + 1, {
                                         name: titles[orgIndex + 1],
                                         dest: ""
                                     })
@@ -596,7 +598,8 @@
                             destName: destArr[destIndex]
                         });
                         out.dest += destVal;
-                        if (destIndex < destArr.length - 1)
+
+                        if (!$scope.oneToOne && destIndex < destArr.length - 1)
                             setTimeout(function () {
                                 calcWithMap(orginArr, destArr, orginNames, destIndex + 1, orgIndex, ret, out)
                             }, getRandomInt(1000, 3000));
@@ -606,7 +609,7 @@
 
                             if (orgIndex < orginArr.length - 1) {
                                 setTimeout(function () {
-                                    calcWithMap(orginArr, destArr, orginNames, 0, orgIndex + 1, ret, {
+                                    calcWithMap(orginArr, destArr, orginNames, ($scope.oneToOne) ? orgIndex + 1 : 0, orgIndex + 1, ret, {
                                         name: orginNames[orgIndex + 1],
                                         dest: ""
                                     })
@@ -629,21 +632,25 @@
                     return;
                 }
                 var orginArr = $scope.orgin.split(/\r?\n/g);
+                var destArr = $scope.dest.split(/\r?\n/g);
                 if ($scope.orginsText.length && orginArr.length != $scope.orginsText.split(/\r?\n/g).length) {
                     alert("Origin title should be for every orging [# of lines]!");
+                    return;
+                }
+                if ($scope.oneToOne && orginArr.length != destArr.length) {
+                    alert("Number of Origins should equal the number of Destinations");
                     return;
                 }
                 if (!$scope.orginsText.length)
                     $scope.orginsText = $scope.orgin;
                 $scope.orgins = $scope.orginsText.split(/\r?\n/g);
 
-                var destArr = $scope.dest.split(/\r?\n/g);
                 $scope.destArr = destArr.slice();
                 $scope.calcButton = true;
                 if (!$scope.showMap) {
                     var dest = [];
                     while (destArr.length) {
-                        dest.push(destArr.splice(0, 5));
+                        dest.push(destArr.splice(0, ($scope.oneToOne) ? 1 : 5));
                     }
                     calcIt(orginArr, dest, $scope.orgins, 0, 0, {
                         name: $scope.orgins[0],
@@ -660,6 +667,17 @@
 
             $scope.getOutput = function () {
                 var output = $scope.output;
+
+                if ($scope.oneToOne) {
+                    var ret = [["Origin", "Destination", "Distance"]];
+                    for (var j = 0; j < output.length; j++) {
+                        var arr = [$scope.orgins[j], $scope.destArr[j], output[j].dest];
+                        if ($scope.showMap)
+                            arr.push($scope.outWithMap[j].staticMap);
+                        ret.push(arr);
+                    }
+                    return ret;
+                }
                 var dests = [];
                 for (var j = 0; j < output.length; j++) {
                     var items = output[j].dest.split(/\r?\n/g);
@@ -761,6 +779,12 @@
                 theWindow.document.close();
                 theWindow.focus();
             }
+
+            $scope.resetAll = function () {
+                $scope.output = [];
+                $scope.outTable = [];
+                $scope.outWithMap = [];
+            }
         });
 
         window.onload = function () {
@@ -807,7 +831,7 @@
                 </div>
                 <div class="editContent">
                     <div class="form-group">
-                       <textarea class="form-control" rows="3" name="orgin" ng-model="orgin">
+                       <textarea class="form-control" rows="3" name="orgin" ng-model="orgin" ng-change="resetAll()">
 </textarea>
                     </div>
                     <div class="editContent">
@@ -815,25 +839,28 @@
                     </div>
                     <div class="editContent">
                         <div class="form-group">
-                       <textarea class="form-control" rows="3" name="orgin" ng-model="orginsText">
+                       <textarea class="form-control" rows="3" name="orgin" ng-model="orginsText"
+                                 ng-change="resetAll()">
 </textarea>
                         </div>
                         <div class="form-group">
                             <h3 class="control-label clouds">Destinations</h3>
-                            <textarea class="form-control" rows="3" name="dest" ng-model="dest">
+                            <textarea class="form-control" rows="3" name="dest" ng-model="dest" ng-change="resetAll()">
 </textarea>
                         </div>
                         <div class="form-group well">
 
-                            <span><input type="radio" name="km" ng-model="km" value="1"> Km</span>
-                            <span><input type="radio" name="km" ng-model="km" value="0"> Meter</span>
+                            <span><input type="radio" name="km" ng-model="km" value="1" ng-click="resetAll()"> Km</span>
+                            <span><input type="radio" name="km" ng-model="km" value="0"
+                                         ng-click="resetAll()"> Meter</span>
                             <br>
-                            <span><input type="checkbox" name="highways" ng-model="highways"> Avoid highways</span>
+                            <span><input type="checkbox" name="highways" ng-model="highways" ng-click="resetAll()"> Avoid highways</span>
                             <br>
-                            <span><input type="checkbox" name="tolls" ng-model="tolls"> Avoid tolls</span>
+                            <span><input type="checkbox" name="tolls" ng-model="tolls" ng-click="resetAll()"> Avoid tolls</span>
                             <br>
-                            <span><input type="checkbox" name="showMap" ng-model="showMap"> Show map</span>
-
+                            <span><input type="checkbox" name="showMap" ng-model="showMap" ng-click="resetAll()"> Show map</span>
+                            <br>
+                            <span><input type="checkbox" name="oneToOne" ng-model="oneToOne" ng-click="resetAll()"> One to one</span>
                         </div>
                     </div>
                 </div>
@@ -853,11 +880,11 @@
                         Show table
                     </button>
                     <button type="button" class="btn btn-info btn-block" ng-click="showReport()"
-                            ng-show="!calcButton && output.length&&showMap">
+                            ng-show="!calcButton && outWithMap.length">
                         Show Report
                     </button>
                     <button type="button" class="btn btn-default btn-block" ng-click="showReportIframe()"
-                            ng-show="!calcButton && output.length&&showMap">
+                            ng-show="!calcButton && outWithMap.length">
                         Show Report [Embedded map]
                     </button>
                     <div>
