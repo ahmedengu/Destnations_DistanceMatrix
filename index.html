@@ -17,9 +17,9 @@
             for (var d in b)Y.call(b, d) && (a[d] = b[d]);
             return c.prototype = b.prototype, a.prototype = new c, a.__super__ = b.prototype, a
         }, $ = [].indexOf || function (a) {
-                    for (var b = 0, c = this.length; c > b; b++)if (b in this && this[b] === a)return b;
-                    return -1
-                };
+                for (var b = 0, c = this.length; c > b; b++)if (b in this && this[b] === a)return b;
+                return -1
+            };
         for (u = {
             catchupTime: 100,
             initialRate: .03,
@@ -492,10 +492,13 @@
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
+        Number.prototype.map = function (in_min, in_max, out_min, out_max) {
+            return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
         Array.prototype.transpose = function () {
             var a = this,
-                    w = a.length ? a.length : 0,
-                    h = a[0] instanceof Array ? a[0].length : 0;
+                w = a.length ? a.length : 0,
+                h = a[0] instanceof Array ? a[0].length : 0;
             if (h === 0 || w === 0) {
                 return [];
             }
@@ -519,6 +522,7 @@
             $scope.dest = "";
             $scope.orgin = "";
             $scope.showMap = true;
+            $scope.weight = "";
 
             var distanceMatrixService = new google.maps.DistanceMatrixService;
             var directionsService = new google.maps.DirectionsService();
@@ -587,7 +591,8 @@
                         $scope.output = [];
                         $scope.$apply();
                     } else {
-                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=500x400&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng()) + "&path=weight:4|color:red|enc:" + encodeURI(result.routes[0].overview_polyline);
+                        var destLatLng = encodeURI(result.routes[0].legs[0].end_location.lat() + "," + result.routes[0].legs[0].end_location.lng());
+                        var staticMap = "http://maps.googleapis.com/maps/api/staticmap?key=AIzaSyA7qBJy-453qS9XBAA8ksudZJCxhG6kB10&size=500x400&markers=color:red%7Clabel:A|" + encodeURI(result.routes[0].legs[0].start_location.lat() + "," + result.routes[0].legs[0].start_location.lng()) + "&markers=color:blue%7Clabel:B|" + destLatLng + "&path=weight:4|color:red|enc:" + encodeURI(result.routes[0].overview_polyline);
                         var destVal = result.routes[0].legs[0].distance.value;
                         destVal = (($scope.km == '1') ? Math.round(destVal / 1000) : destVal) + '\n';
                         ret.push({
@@ -595,7 +600,9 @@
                             dest: destVal,
                             staticMap: staticMap,
                             time: result.routes[0].legs[0].duration.text,
-                            destName: destArr[destIndex]
+                            destName: destArr[destIndex],
+                            weight: ($scope.weightArr && $scope.weightArr[destIndex]) ? $scope.weightArr[destIndex] : -1,
+                            destLatLng: destLatLng
                         });
                         out.dest += destVal;
 
@@ -633,13 +640,23 @@
                 }
                 var orginArr = $scope.orgin.split(/\r?\n/g);
                 var destArr = $scope.dest.split(/\r?\n/g);
+                var weightArr = $scope.weight.split(/\r?\n/g);
+                $scope.weightArr = weightArr;
                 if ($scope.orginsText.length && orginArr.length != $scope.orginsText.split(/\r?\n/g).length) {
-                    alert("Origin title should be for every orging [# of lines]!");
+                    alert("Origin title should be for every Origin [# of lines]!");
                     return;
                 }
                 if ($scope.oneToOne && orginArr.length != destArr.length) {
                     alert("Number of Origins should equal the number of Destinations");
                     return;
+                }
+                if (weightArr.length > 1 && weightArr.length != destArr.length) {
+                    alert("Number of weights should equal the number of Destinations");
+                    return;
+                }
+                if (weightArr.length) {
+                    $scope.weightMax = Math.max.apply(Math, weightArr);
+                    $scope.weightMin = Math.min.apply(Math, weightArr);
                 }
                 if (!$scope.orginsText.length)
                     $scope.orginsText = $scope.orgin;
@@ -728,7 +745,6 @@
                 theWindow = window.open("", "Table");
                 theWindow.document.write("<html><head><title>Table</title><style> table { font-family: arial, sans-serif; border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; } tr:nth-child(even) { background-color: #dddddd; } </style></head><body>" + table + " <script>document.onreadystatechange = function(){ if(document.readyState === 'complete'){window.print();} }\x3C/script></body></html>");
                 theWindow.document.close();
-                theWindow.focus();
             }
 
             $scope.showReport = function () {
@@ -783,6 +799,53 @@
                 theWindow.focus();
             }
 
+            $scope.showReportAllPins = function () {
+                $scope.outWithMap
+                var table = "<table><tbody>";
+//                last = "";
+                for (var j = 0; j < $scope.outWithMap.length; j++) {
+//                    if ($scope.outWithMap[j].name != last) {
+//                        table += "<tr><td colspan='2'><h3 align='center'>Route and Distance from " + $scope.outWithMap[j].name + " to Multiple Destinations</h3></td></tr>";
+//                        last = $scope.outWithMap[j].name;
+//                    }
+                    table += "<tr>";
+                    table += "<td>Drive " + $scope.outWithMap[j].dest + (($scope.km == '1') ? " Km,  " : " Meter,  ") + $scope.outWithMap[j].time + "</br></br>" + "<img src='icons/red_MarkerA.png' />  " + $scope.outWithMap[j].name + "</br>" + "<img src='icons/blue_MarkerB.png' />  " + $scope.outWithMap[j].destName + "</br><a href='http://www.google.com.eg/maps/dir/" + encodeURI($scope.outWithMap[j].name) + "/" + encodeURI($scope.outWithMap[j].destName) + "'>Source</a></td>";
+
+                    var staticMap = $scope.outWithMap[j].staticMap.replace("500x400", "650x800");
+                    for (var i = 0; i < $scope.outWithMap.length; i++) {
+                        if (i == j)
+                            continue;
+
+                        var color = function () {
+                            var map = (isNaN($scope.outWithMap[i].weight)) ? "" : parseInt($scope.outWithMap[i].weight).map(parseInt($scope.weightMin), parseInt($scope.weightMax), 0, 3);
+                            switch (Math.round(map)) {
+                                case 0:
+                                    return "0x0033FF";
+                                case 1:
+                                    return "0x0033CC";
+                                case 2:
+                                    return "0x003399";
+                                case 3:
+                                    return "0x003333";
+                                default:
+                                    return "0x003333";
+                            }
+                        };
+                        staticMap += "&markers=color:" + color() + "|" + $scope.outWithMap[i].destLatLng;
+                    }
+                    table += "<td><img src='" + staticMap + "' /></td>";
+
+
+                    table += "</tr>";
+                }
+                table += "</tbody></table>";
+                if (theWindow)
+                    theWindow.close();
+                theWindow = window.open("", "Report");
+                theWindow.document.write("<html><head><title>Report</title><style> table { font-family: arial, sans-serif; border-collapse: collapse; width: 100%; } td, th { border: 1px solid #dddddd; text-align: left; padding: 8px; } tr:nth-child(even) { background-color: #fbfbfb; } </style></head><body>" + table + " <script>document.onreadystatechange = function(){ if(document.readyState === 'complete'){window.print();} }\x3C/script></body></html>");
+                theWindow.document.close();
+                theWindow.focus();
+            }
             $scope.resetAll = function () {
                 $scope.output = [];
                 $scope.outTable = [];
@@ -834,7 +897,7 @@
                 </div>
                 <div class="editContent">
                     <div class="form-group">
-                       <textarea class="form-control" rows="3" name="orgin" ng-model="orgin" >
+                       <textarea class="form-control" rows="3" name="orgin" ng-model="orgin">
 </textarea>
                     </div>
                     <div class="editContent">
@@ -843,27 +906,38 @@
                     <div class="editContent">
                         <div class="form-group">
                        <textarea class="form-control" rows="3" name="orgin" ng-model="orginsText"
-                                 >
+                       >
 </textarea>
                         </div>
                         <div class="form-group">
                             <h3 class="control-label clouds">Destinations</h3>
-                            <textarea class="form-control" rows="3" name="dest" ng-model="dest" >
+                            <textarea class="form-control" rows="3" name="dest" ng-model="dest">
+</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <i class="control-label clouds">Weights [optional]</i>
+                            <textarea class="form-control" rows="3" name="weight" ng-model="weight">
 </textarea>
                         </div>
                         <div class="form-group well">
 
-                            <span><input type="radio" name="km" ng-model="km" value="1" ng-click="resetAll()" ng-disabled="calcButton"> Km</span>
+                            <span><input type="radio" name="km" ng-model="km" value="1" ng-click="resetAll()"
+                                         ng-disabled="calcButton"> Km</span>
                             <span><input type="radio" name="km" ng-model="km" value="0"
                                          ng-click="resetAll()" ng-disabled="calcButton"> Meter</span>
                             <br>
-                            <span><input type="checkbox" name="highways" ng-model="highways" ng-click="resetAll()" ng-disabled="calcButton"> Avoid highways</span>
+                            <span><input type="checkbox" name="highways" ng-model="highways" ng-click="resetAll()"
+                                         ng-disabled="calcButton"> Avoid highways</span>
                             <br>
-                            <span><input type="checkbox" name="tolls" ng-model="tolls" ng-click="resetAll()" ng-disabled="calcButton"> Avoid tolls</span>
+                            <span><input type="checkbox" name="tolls" ng-model="tolls" ng-click="resetAll()"
+                                         ng-disabled="calcButton"> Avoid tolls</span>
                             <br>
-                            <span><input type="checkbox" name="showMap" ng-model="showMap" ng-click="resetAll()" ng-disabled="calcButton"> Show map</span>
+                            <span><input type="checkbox" name="showMap" ng-model="showMap" ng-click="resetAll()"
+                                         ng-disabled="calcButton"> Show map</span>
                             <br>
-                            <span><input type="checkbox" name="oneToOne" ng-model="oneToOne" ng-click="resetAll()" ng-disabled="calcButton"> One to one</span>
+                            <span><input type="checkbox" name="oneToOne" ng-model="oneToOne" ng-click="resetAll()"
+                                         ng-disabled="calcButton"> One to one</span>
                         </div>
                     </div>
                 </div>
@@ -890,6 +964,10 @@
                             ng-show="!calcButton && outWithMap.length">
                         Show Report [Embedded map]
                     </button>
+                    <button type="button" class="btn btn-default btn-block" ng-click="showReportAllPins()"
+                            ng-show="!calcButton && outWithMap.length">
+                        Show Report [All pins included]
+                    </button>
                     <div>
                     </div>
                     <div>
@@ -911,10 +989,17 @@
         src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
 
 <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
     ga('create', 'UA-87845813-1', 'auto');
     ga('send', 'pageview');
