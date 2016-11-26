@@ -819,19 +819,19 @@
                         var color = function () {
                             var map = (isNaN($scope.outWithMap[i].weight)) ? "" : parseInt($scope.outWithMap[i].weight).map(parseInt($scope.weightMin), parseInt($scope.weightMax), 0, 3);
                             switch (Math.round(map)) {
-                                case 0:
-                                    return "0x0033FF";
-                                case 1:
-                                    return "0x0033CC";
-                                case 2:
-                                    return "0x003399";
-                                case 3:
-                                    return "0x003333";
+//                                case 0:
+//                                    return "0x0033FF";
+//                                case 1:
+//                                    return "0x0033CC";
+//                                case 2:
+//                                    return "0x003399";
+//                                case 3:
+//                                    return "0x003333";
                                 default:
-                                    return "0x003333";
+                                    return "0x00b3ff";
                             }
                         };
-                        staticMap += "&markers=color:" + color() + "|" + $scope.outWithMap[i].destLatLng;
+                        staticMap += "&markers=size:tiny|color:" + color() + "|" + $scope.outWithMap[i].destLatLng;
                     }
                     table += "<td><img src='" + staticMap + "' /></td>";
 
